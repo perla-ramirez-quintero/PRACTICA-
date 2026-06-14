@@ -1,0 +1,1762 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>El Pirata Numerón y las Crayolas Perdidas</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;700;900&display=swap');
+
+        :root {
+            --color-sky: #87CEEB;
+            --color-sea: #1E90FF;
+            --color-sand: #F4A460;
+            --color-pirate-red: #FF4757;
+            --color-gold: #FFD700;
+            --color-dark: #2F3542;
+            --color-glass-bg: rgba(255, 255, 255, 0.25);
+            --color-glass-border: rgba(255, 255, 255, 0.4);
+            --shadow-premium: 0 12px 32px 0 rgba(31, 38, 135, 0.2);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        html, body {
+            height: 100%;
+            width: 100%;
+            overflow: hidden;
+            overscroll-behavior-y: none;
+        }
+
+        body {
+            font-family: 'Nunito', sans-serif;
+            background: linear-gradient(180deg, #87CEEB 0%, #1E90FF 60%, #123456 100%);
+            color: white;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        h1, h2, h3 {
+            font-family: 'Fredoka One', cursive;
+            text-shadow: 3px 3px 0px rgba(0,0,0,0.25);
+            text-align: center;
+        }
+
+        /* Ambient elements */
+        .ambient-cloud {
+            position: absolute;
+            background: white;
+            border-radius: 50px;
+            opacity: 0.8;
+            pointer-events: none;
+            animation: moveCloud linear infinite;
+        }
+
+        .ambient-cloud::before, .ambient-cloud::after {
+            content: '';
+            position: absolute;
+            background: white;
+            border-radius: 50%;
+        }
+
+        .ambient-cloud.c1 { width: 120px; height: 40px; top: 8%; left: -150px; animation-duration: 35s; }
+        .ambient-cloud.c1::before { width: 50px; height: 50px; top: -25px; left: 15px; }
+        .ambient-cloud.c1::after { width: 60px; height: 60px; top: -30px; left: 45px; }
+
+        .ambient-cloud.c2 { width: 80px; height: 30px; top: 15%; left: -100px; animation-duration: 25s; animation-delay: 5s; opacity: 0.6; }
+        .ambient-cloud.c2::before { width: 35px; height: 35px; top: -15px; left: 10px; }
+        .ambient-cloud.c2::after { width: 40px; height: 40px; top: -20px; left: 30px; }
+
+        @keyframes moveCloud {
+            0% { left: -150px; }
+            100% { left: 105%; }
+        }
+
+        /* Wave effects */
+        .waves {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            height: 12vh;
+            min-height: 80px;
+            max-height: 130px;
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        .parallax > use {
+            animation: move-forever 25s cubic-bezier(.55,.5,.45,.5) infinite;
+        }
+        .parallax > use:nth-child(1) { animation-delay: -2s; animation-duration: 7s; }
+        .parallax > use:nth-child(2) { animation-delay: -3s; animation-duration: 10s; }
+        .parallax > use:nth-child(3) { animation-delay: -4s; animation-duration: 13s; }
+        .parallax > use:nth-child(4) { animation-delay: -5s; animation-duration: 20s; }
+
+        @keyframes move-forever {
+            0% { transform: translate3d(-90px,0,0); }
+            100% { transform: translate3d(85px,0,0); }
+        }
+
+        /* Screen Manager */
+        .screen {
+            display: none;
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            flex-direction: column;
+            align-items: center;
+            padding: 15px;
+            z-index: 2;
+            overflow-y: auto;
+            animation: zoomIn 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+
+        .screen.active {
+            display: flex;
+        }
+
+        @keyframes zoomIn {
+            from { transform: scale(0.9); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        /* Custom Crayon Box UI (Level 1) */
+        .crayon-box-container {
+            background: linear-gradient(135deg, #ffd32c 0%, #ff9f1a 100%);
+            border: 4px solid #fff;
+            border-radius: 20px;
+            width: 280px;
+            height: 150px;
+            position: relative;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            padding: 10px;
+            overflow: visible;
+        }
+
+        .crayon-box-cover {
+            position: absolute;
+            top: 0; left: 0; right: 0; height: 42px;
+            background: #ff4757;
+            border-bottom: 5px solid #ff6b81;
+            border-radius: 16px 16px 0 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Fredoka One', cursive;
+            font-size: 1.1rem;
+            color: white;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+        }
+
+        .crayon-slots {
+            display: flex;
+            justify-content: space-around;
+            align-items: flex-end;
+            height: 90px;
+            width: 100%;
+            border-top: 4px dashed rgba(255,255,255,0.4);
+            padding-top: 8px;
+        }
+
+        .crayon-slot-silhouette {
+            width: 32px;
+            height: 80px;
+            border-radius: 6px 6px 0 0;
+            background: rgba(0, 0, 0, 0.15);
+            border: 2px dashed rgba(255, 255, 255, 0.4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Fredoka One', cursive;
+            font-size: 1.2rem;
+            color: rgba(255,255,255,0.4);
+        }
+
+        /* CSS Crayons */
+        .crayon {
+            width: 34px;
+            height: 100px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            cursor: pointer;
+            position: relative;
+            transition: transform 0.2s, filter 0.2s;
+            filter: drop-shadow(2px 4px 5px rgba(0,0,0,0.3));
+        }
+
+        .crayon:active {
+            transform: scale(0.95);
+        }
+
+        .crayon-tip {
+            width: 0;
+            height: 0;
+            border-left: 17px solid transparent;
+            border-right: 17px solid transparent;
+            border-bottom: 18px solid var(--crayon-color);
+            margin-bottom: -1px;
+            border-radius: 4px;
+        }
+
+        .crayon-body {
+            width: 34px;
+            height: 82px;
+            background-color: var(--crayon-color);
+            border-radius: 0 0 8px 8px;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Fredoka One', cursive;
+            font-size: 1.5rem;
+            color: white;
+            text-shadow: 2px 2px 0px rgba(0, 0, 0, 0.4);
+            border-left: 2px solid rgba(255,255,255,0.25);
+            border-right: 2px solid rgba(0,0,0,0.2);
+        }
+
+        .crayon-body::before {
+            content: '';
+            position: absolute;
+            top: 15px; bottom: 15px; left: 0; right: 0;
+            border-top: 4px double rgba(0, 0, 0, 0.35);
+            border-bottom: 4px double rgba(0, 0, 0, 0.35);
+            pointer-events: none;
+        }
+
+        /* Top Bar & Instructions */
+        .header-bar {
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 20px;
+            background: var(--color-glass-bg);
+            backdrop-filter: blur(8px);
+            border-bottom: 2px solid var(--color-glass-border);
+            z-index: 10;
+        }
+
+        .header-title {
+            font-size: 1.5rem;
+            color: var(--color-gold);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .instruction-card {
+            background: white;
+            color: var(--color-dark);
+            border-radius: 20px;
+            padding: 10px 18px;
+            margin: 10px 0;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+            font-weight: bold;
+            font-size: 1.15rem;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            max-width: 500px;
+            width: 95%;
+            cursor: pointer;
+            transition: transform 0.2s;
+            border: 3px solid var(--color-gold);
+        }
+
+        .instruction-card:active {
+            transform: scale(0.98);
+        }
+
+        .speaker-btn {
+            font-size: 1.5rem;
+            background: #f1f2f6;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 0 #ced6e0;
+        }
+
+        /* Buttons & Menu */
+        .btn-game {
+            background: linear-gradient(135deg, var(--color-pirate-red) 0%, #ff6b81 100%);
+            border: none;
+            border-radius: 50px;
+            padding: 12px 30px;
+            color: white;
+            font-family: 'Fredoka One', cursive;
+            font-size: 1.25rem;
+            box-shadow: 0 6px 0 #c94c4c, 0 10px 20px rgba(0,0,0,0.3);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: transform 0.1s, box-shadow 0.1s;
+        }
+
+        .btn-game:active {
+            transform: translateY(4px);
+            box-shadow: 0 2px 0 #c94c4c, 0 4px 10px rgba(0,0,0,0.3);
+        }
+
+        .btn-back {
+            background: linear-gradient(135deg, #747d8c 0%, #2f3542 100%);
+            box-shadow: 0 6px 0 #1e222b, 0 10px 20px rgba(0,0,0,0.2);
+        }
+        .btn-back:active {
+            box-shadow: 0 2px 0 #1e222b;
+        }
+
+        /* Screen Menu Principal */
+        .pirate-logo {
+            font-size: 5rem;
+            margin: 15px 0;
+            animation: floatPirate 3s ease-in-out infinite;
+            filter: drop-shadow(0 10px 15px rgba(0,0,0,0.4));
+        }
+
+        @keyframes floatPirate {
+            0% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-12px) rotate(-3deg); }
+            100% { transform: translateY(0px) rotate(0deg); }
+        }
+
+        .menu-list {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            width: 100%;
+            max-width: 380px;
+            margin-top: 10px;
+        }
+
+        .menu-card {
+            background: var(--color-glass-bg);
+            border: 3px solid var(--color-glass-border);
+            border-radius: 20px;
+            padding: 12px 16px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            cursor: pointer;
+            box-shadow: var(--shadow-premium);
+            backdrop-filter: blur(10px);
+            transition: transform 0.2s, background 0.2s;
+        }
+
+        .menu-card:active {
+            transform: scale(0.96);
+            background: rgba(255, 255, 255, 0.35);
+        }
+
+        .menu-card-icon {
+            font-size: 2.2rem;
+            background: white;
+            border-radius: 16px;
+            width: 55px;
+            height: 55px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 5px 10px rgba(0,0,0,0.15);
+        }
+
+        .menu-card-info {
+            display: flex;
+            flex-direction: column;
+            text-align: left;
+        }
+
+        .menu-card-title {
+            font-family: 'Fredoka One', cursive;
+            color: var(--color-gold);
+            font-size: 1.25rem;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.4);
+        }
+
+        .menu-card-desc {
+            font-size: 0.85rem;
+            opacity: 0.95;
+            font-weight: 700;
+        }
+
+        /* LEVEL 1: BUSQUEDA */
+        .island-sandbox {
+            position: relative;
+            flex: 1;
+            width: 100%;
+            max-width: 600px;
+            min-height: 250px;
+            background: radial-gradient(circle at bottom, #ffeaa7 15%, #f4a460 70%, #d5a6bd 100%);
+            border: 4px solid white;
+            border-radius: 30px;
+            margin-bottom: 15px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+
+        .island-element {
+            position: absolute;
+            font-size: 3.5rem;
+            filter: drop-shadow(2px 4px 4px rgba(0,0,0,0.25));
+        }
+
+        .coconut-tree { bottom: 8%; left: 6%; font-size: 5.5rem; z-index: 3; }
+        .pirate-chest { bottom: 8%; right: 10%; font-size: 4.5rem; z-index: 3; cursor: pointer; }
+        .large-rock { bottom: 5%; left: 45%; font-size: 3.5rem; z-index: 3; }
+        .crab-friend { bottom: 22%; right: 38%; font-size: 2.5rem; z-index: 3; animation: walkCrab 6s linear infinite; }
+        .barrel { bottom: 24%; left: 24%; font-size: 3.2rem; z-index: 3; }
+
+        @keyframes walkCrab {
+            0% { transform: translateX(0) scaleX(1); }
+            50% { transform: translateX(35px) scaleX(1); }
+            51% { transform: translateX(35px) scaleX(-1); }
+            100% { transform: translateX(0) scaleX(-1); }
+        }
+
+        .hidden-crayon {
+            position: absolute;
+            z-index: 2;
+            transition: all 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        /* LEVEL 2: DYNAMIC LAYOUTS */
+        .compare-layout-l2 {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 15px;
+            width: 100%;
+            max-width: 550px;
+            margin-bottom: 10px;
+        }
+
+        .compare-card-l2 {
+            flex: 1;
+            background: var(--color-glass-bg);
+            border: 3px solid var(--color-glass-border);
+            border-radius: 24px;
+            padding: 12px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+            box-shadow: var(--shadow-premium);
+            backdrop-filter: blur(10px);
+            transition: transform 0.2s, border-color 0.2s, background-color 0.2s;
+            height: 200px;
+            justify-content: center;
+            position: relative;
+        }
+
+        .compare-card-l2:active {
+            transform: scale(0.96);
+        }
+
+        .compare-card-l2.correct {
+            border-color: #2ed573;
+            background: rgba(46, 213, 115, 0.35);
+            animation: pulseCard 0.6s;
+        }
+
+        .compare-card-l2.incorrect {
+            border-color: var(--color-pirate-red);
+            background: rgba(255, 71, 87, 0.3);
+            animation: shakeCard 0.5s;
+        }
+
+        .compare-card-label {
+            position: absolute;
+            top: -15px;
+            background: var(--color-pirate-red);
+            padding: 4px 14px;
+            border-radius: 20px;
+            font-family: 'Fredoka One', cursive;
+            font-size: 0.95rem;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            border: 2px solid white;
+        }
+
+        .crayons-display-grid {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 4px;
+            max-width: 100%;
+            width: 100%;
+        }
+
+        .crayons-display-grid .crayon {
+            transform: scale(0.65);
+            margin: -15px -10px;
+            pointer-events: none;
+        }
+
+        @keyframes shakeCard {
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-8px); }
+            40%, 80% { transform: translateX(8px); }
+        }
+
+        @keyframes pulseCard {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        /* Balance Scale Platform (Reto 4) */
+        .balance-scale-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+            max-width: 440px;
+            height: 230px;
+            position: relative;
+            margin: 15px 0;
+            background: rgba(255,255,255,0.08);
+            border-radius: 24px;
+            border: 2px dashed rgba(255,255,255,0.15);
+            padding: 10px;
+        }
+
+        .scale-pillar {
+            width: 14px;
+            height: 160px;
+            background: linear-gradient(90deg, #ffc048 0%, #ffa801 100%);
+            border: 2px solid #fff;
+            border-radius: 8px 8px 0 0;
+            position: absolute;
+            bottom: 20px;
+            z-index: 1;
+        }
+
+        .scale-base {
+            width: 100px;
+            height: 16px;
+            background: #ff5e57;
+            border: 2px solid #fff;
+            border-radius: 10px;
+            position: absolute;
+            bottom: 4px;
+            z-index: 1;
+        }
+
+        .scale-beam {
+            width: 320px;
+            height: 10px;
+            background: linear-gradient(90deg, #ffa801 0%, #ffc048 50%, #ffa801 100%);
+            border: 2px solid #fff;
+            border-radius: 6px;
+            position: absolute;
+            top: 40px;
+            transform-origin: center center;
+            transition: transform 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            z-index: 2;
+        }
+
+        .scale-pan-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: absolute;
+            top: 5px;
+            transition: transform 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            width: 100px;
+        }
+
+        .scale-pan-container.left {
+            left: -35px;
+            transform-origin: center top;
+        }
+
+        .scale-pan-container.right {
+            right: -35px;
+            transform-origin: center top;
+        }
+
+        .scale-strings {
+            width: 80px;
+            height: 60px;
+            position: relative;
+        }
+
+        .scale-strings::before, .scale-strings::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            width: 2px;
+            height: 60px;
+            background: rgba(255,255,255,0.7);
+        }
+
+        .scale-strings::before { left: 10px; transform: rotate(25deg); transform-origin: left top; }
+        .scale-strings::after { right: 10px; transform: rotate(-25deg); transform-origin: right top; }
+
+        .scale-pan {
+            width: 90px;
+            height: 15px;
+            background: linear-gradient(135deg, #1dd1a1 0%, #10ac84 100%);
+            border: 2px solid #fff;
+            border-radius: 0 0 40px 40px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.25);
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: flex-end;
+        }
+
+        .scale-crayons-area {
+            position: absolute;
+            bottom: 8px;
+            display: flex;
+            justify-content: center;
+            align-items: flex-end;
+            gap: 2px;
+            width: 80px;
+            height: 60px;
+            overflow: visible;
+        }
+
+        .scale-crayons-area .crayon {
+            transform: scale(0.48);
+            margin: -25px -13px;
+            pointer-events: none;
+        }
+
+        .scale-btn-add {
+            background: linear-gradient(135deg, #ffd32c 0%, #ff9f1a 100%);
+            border: 2px solid white;
+            border-radius: 50%;
+            width: 46px;
+            height: 46px;
+            color: var(--color-dark);
+            font-family: 'Fredoka One', cursive;
+            font-size: 1.6rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+            cursor: pointer;
+            margin-top: 10px;
+            transition: transform 0.1s;
+            z-index: 10;
+        }
+
+        .scale-btn-add:active {
+            transform: scale(0.9);
+        }
+
+        /* LEVEL 3: SERIACION HASTA EL 20 */
+        .crayon-box-20 {
+            background: linear-gradient(135deg, #ffd32c 0%, #ff9f1a 100%);
+            border: 4px solid #fff;
+            border-radius: 20px;
+            width: 95%;
+            max-width: 480px;
+            height: 155px;
+            position: relative;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            padding: 8px;
+            margin-top: 10px;
+            overflow: visible;
+        }
+
+        .crayon-box-20-cover {
+            position: absolute;
+            top: 0; left: 0; right: 0; height: 32px;
+            background: #ff4757;
+            border-bottom: 4px solid #ff6b81;
+            border-radius: 16px 16px 0 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Fredoka One', cursive;
+            font-size: 1rem;
+            color: white;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+        }
+
+        .slots-grid-20 {
+            display: grid;
+            grid-template-rows: repeat(2, 52px);
+            grid-template-columns: repeat(10, 1fr);
+            gap: 3px;
+            width: 100%;
+            height: 108px;
+            padding-top: 4px;
+            border-top: 3px dashed rgba(255,255,255,0.4);
+        }
+
+        .slot-silhouette-20 {
+            border-radius: 4px 4px 0 0;
+            background: rgba(0, 0, 0, 0.15);
+            border: 1px dashed rgba(255, 255, 255, 0.4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Fredoka One', cursive;
+            font-size: 0.9rem;
+            color: rgba(255,255,255,0.35);
+            height: 100%;
+            width: 100%;
+            overflow: visible;
+            position: relative;
+        }
+
+        .slot-silhouette-20 .crayon {
+            transform: scale(0.48);
+            transform-origin: bottom center;
+            position: absolute;
+            bottom: 0;
+            cursor: default;
+        }
+
+        .crayons-drawer-20 {
+            background: rgba(255, 255, 255, 0.15);
+            border: 2px dashed rgba(255,255,255,0.3);
+            border-radius: 20px;
+            width: 95%;
+            max-width: 480px;
+            padding: 10px;
+            height: 175px;
+            overflow-y: auto;
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 8px;
+            justify-items: center;
+            box-shadow: inset 0 4px 10px rgba(0,0,0,0.1);
+            margin-top: 10px;
+        }
+
+        .crayons-drawer-20 .crayon {
+            transform: scale(0.65);
+            margin: -15px 0;
+            transform-origin: center center;
+        }
+
+        /* Success & Star Overlay */
+        .overlay-success {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0, 0, 0, 0.85);
+            z-index: 100;
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            animation: fadeIn 0.4s forwards;
+            padding: 20px;
+        }
+
+        .overlay-success.active {
+            display: flex;
+        }
+
+        .gold-star {
+            font-size: 7rem;
+            animation: spinStar 1.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) infinite alternate;
+            filter: drop-shadow(0 0 25px rgba(255, 215, 0, 0.8));
+        }
+
+        @keyframes spinStar {
+            0% { transform: scale(0.9) rotate(-10deg); }
+            100% { transform: scale(1.15) rotate(10deg); }
+        }
+
+        /* General Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .particle {
+            position: absolute;
+            pointer-events: none;
+            z-index: 99;
+            animation: particleFloat 1s ease-out forwards;
+        }
+
+        @keyframes particleFloat {
+            0% { transform: translateY(0) scale(1) rotate(0deg); opacity: 1; }
+            100% { transform: translateY(-120px) scale(0) rotate(180deg); opacity: 0; }
+        }
+
+        /* Bottom Nav Area */
+        .nav-container {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            padding: 10px 20px 20px 20px;
+            z-index: 10;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Ambient Clouds -->
+    <div class="ambient-cloud c1"></div>
+    <div class="ambient-cloud c2"></div>
+
+    <!-- Background Wave Divider -->
+    <svg class="waves" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+         viewBox="0 24 150 28" preserveAspectRatio="none" shape-rendering="auto">
+        <defs>
+            <path id="gentle-wave" d="M-160 44c30 0 58-18 88-18s58 18 88 18 58-18 88-18 58 18 88 18v44h-352z" />
+        </defs>
+        <g class="parallax">
+            <use xlink:href="#gentle-wave" x="48" y="0" fill="rgba(30, 144, 255, 0.3)" />
+            <use xlink:href="#gentle-wave" x="48" y="3" fill="rgba(30, 144, 255, 0.5)" />
+            <use xlink:href="#gentle-wave" x="48" y="5" fill="rgba(30, 144, 255, 0.7)" />
+            <use xlink:href="#gentle-wave" x="48" y="7" fill="#1e90ff" />
+        </g>
+    </svg>
+
+    <!-- HEADER BAR (Hidden on main menu) -->
+    <div id="header-bar" class="header-bar" style="display: none;">
+        <div class="header-title">🏴‍☠️ <span id="game-title-text">Nivel</span></div>
+        <div style="font-family: 'Fredoka One', cursive; font-size: 1.25rem; color: var(--color-gold);" id="top-score-display"></div>
+    </div>
+
+    <!-- ================= SCREEN: MENU PRINCIPAL ================= -->
+    <div id="screen-menu" class="screen active">
+        <h1 style="color: var(--color-gold); font-size: 2.1rem; margin-top: 10px;">El Pirata Numerón</h1>
+        <h3 style="font-size: 1.15rem; color: #fff; opacity: 0.9;">¡Las Crayolas Perdidas!</h3>
+
+        <div class="pirate-logo">🏴‍☠️🎨</div>
+
+        <div class="instruction-card" onclick="speakStory()">
+            <div class="speaker-btn">🔊</div>
+            <p style="font-size: 0.95rem; line-height: 1.35;">
+                "¡Hola grumete! Soy el Pirata Numerón. Mis crayolas se cayeron en la isla. ¿Me ayudas a encontrarlas y ordenarlas en mi cofre?"
+            </p>
+        </div>
+
+        <div class="menu-list">
+            <div class="menu-card" onclick="startLevel(1)">
+                <div class="menu-card-icon">🏝️</div>
+                <div class="menu-card-info">
+                    <span class="menu-card-title">Misión 1: ¡A buscar!</span>
+                    <span class="menu-card-desc">Encuentra y cuenta del 1 al 5 (1º)</span>
+                </div>
+            </div>
+
+            <div class="menu-card" onclick="startLevel(2)">
+                <div class="menu-card-icon">⚖️</div>
+                <div class="menu-card-info">
+                    <span class="menu-card-title">Misión 2: Los Retos Pirata</span>
+                    <span class="menu-card-desc">Juegos de comparar y la balanza (2º)</span>
+                </div>
+            </div>
+
+            <div class="menu-card" onclick="startLevel(3)">
+                <div class="menu-card-icon">🖍️</div>
+                <div class="menu-card-info">
+                    <span class="menu-card-title">Misión 3: La Gran Caja (1-20)</span>
+                    <span class="menu-card-desc">Ordena del 1 al 20 en la caja (3º)</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ================= SCREEN: LEVEL 1 (BUSQUEDA Y CONTEO) ================= -->
+    <div id="screen-level1" class="screen">
+        <div class="instruction-card" id="inst-l1" onclick="speakCurrentInstruction()">
+            <div class="speaker-btn">🔊</div>
+            <span style="font-size: 1rem;">Busca y toca las crayolas escondidas en la playa.</span>
+        </div>
+
+        <div class="island-sandbox" id="sandbox-l1">
+            <!-- Background Beach Details -->
+            <div class="island-element coconut-tree">🌴</div>
+            <div class="island-element pirate-chest" onclick="clickChest()">📦</div>
+            <div class="island-element large-rock">🪨</div>
+            <div class="island-element crab-friend">🦀</div>
+            <div class="island-element barrel">🛢️</div>
+        </div>
+
+        <div class="crayon-box-container">
+            <div class="crayon-box-cover">Caja de Numerón</div>
+            <div class="crayon-slots" id="slots-l1">
+                <div class="crayon-slot-silhouette">?</div>
+                <div class="crayon-slot-silhouette">?</div>
+                <div class="crayon-slot-silhouette">?</div>
+                <div class="crayon-slot-silhouette">?</div>
+                <div class="crayon-slot-silhouette">?</div>
+            </div>
+        </div>
+
+        <div class="nav-container">
+            <button class="btn-game btn-back" onclick="goHome()">🏠 Inicio</button>
+            <button class="btn-game" style="background: #2ed573; box-shadow: 0 6px 0 #219653;" onclick="resetLevel1()">🔄 Otro</button>
+        </div>
+    </div>
+
+    <!-- ================= SCREEN: LEVEL 2 (COMPARACIONES Y BALANZA) ================= -->
+    <div id="screen-level2" class="screen">
+        <div class="instruction-card" id="inst-l2" onclick="speakCurrentInstruction()">
+            <div class="speaker-btn">🔊</div>
+            <span style="font-size: 1rem;" id="txt-inst-l2">Cargando reto...</span>
+        </div>
+
+        <!-- Layout 2A: Compare Cards (Used for Retos: Mas, Menos, Numero Secreto) -->
+        <div class="compare-layout-l2" id="layout-l2-compare">
+            <div class="compare-card-l2" id="card-l2-left" onclick="selectCompareCard('left')">
+                <div class="compare-card-label" id="lbl-l2-left">Caja A</div>
+                <div class="crayons-display-grid" id="grid-l2-left"></div>
+            </div>
+            <div class="compare-card-l2" id="card-l2-right" onclick="selectCompareCard('right')">
+                <div class="compare-card-label" id="lbl-l2-right">Caja B</div>
+                <div class="crayons-display-grid" id="grid-l2-right"></div>
+            </div>
+            <!-- Dynamic third card for "Numero Secreto" -->
+            <div class="compare-card-l2" id="card-l2-center" onclick="selectCompareCard('center')" style="display: none;">
+                <div class="compare-card-label" id="lbl-l2-center">Caja C</div>
+                <div class="crayons-display-grid" id="grid-l2-center"></div>
+            </div>
+        </div>
+
+        <!-- Layout 2B: Balance Scale (Used for Reto: Balanza) -->
+        <div class="balance-scale-container" id="layout-l2-scale" style="display: none;">
+            <div class="scale-pillar"></div>
+            <div class="scale-base"></div>
+            
+            <div class="scale-beam" id="scale-beam">
+                <!-- Left Platform suspended -->
+                <div class="scale-pan-container left" id="scale-left-pan">
+                    <div class="scale-strings"></div>
+                    <div class="scale-pan">
+                        <div class="scale-crayons-area" id="scale-crayons-left"></div>
+                    </div>
+                </div>
+                
+                <!-- Right Platform suspended -->
+                <div class="scale-pan-container right" id="scale-right-pan">
+                    <div class="scale-strings"></div>
+                    <div class="scale-pan">
+                        <div class="scale-crayons-area" id="scale-crayons-right"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Adding control button right below -->
+            <div style="position: absolute; bottom: 8px; right: 40px; display: flex; flex-direction: column; align-items: center;">
+                <button class="scale-btn-add" onclick="addCrayonToScaleRight()">+</button>
+                <span style="font-family: 'Fredoka One', cursive; font-size: 0.75rem; color: #fff; margin-top: 4px;">Poner</span>
+            </div>
+        </div>
+
+        <div class="nav-container">
+            <button class="btn-game btn-back" onclick="goHome()">🏠 Inicio</button>
+            <button class="btn-game" style="background: #2ed573; box-shadow: 0 6px 0 #219653;" onclick="resetLevel2()">🔄 Otro Reto</button>
+        </div>
+    </div>
+
+    <!-- ================= SCREEN: LEVEL 3 (SERIACION 1 AL 20) ================= -->
+    <div id="screen-level3" class="screen">
+        <div class="instruction-card" id="inst-l3" onclick="speakCurrentInstruction()">
+            <div class="speaker-btn">🔊</div>
+            <span style="font-size: 1rem;" id="txt-inst-l3">¡Vamos a ordenar las crayolas! Busca el número 1.</span>
+        </div>
+
+        <!-- Gran caja de 20 ranuras organizadas en 2 filas de 10 -->
+        <div class="crayon-box-20">
+            <div class="crayon-box-20-cover">Cofre de 20 Crayolas</div>
+            <div class="slots-grid-20" id="slots-l3-grid">
+                <!-- 20 slots will be generated by JS -->
+            </div>
+        </div>
+
+        <!-- Cajón ordenado en rejilla para fácil selección en celulares -->
+        <div class="crayons-drawer-20" id="drawer-l3-grid">
+            <!-- 20 scattered crayons will be generated here -->
+        </div>
+
+        <div class="nav-container">
+            <button class="btn-game btn-back" onclick="goHome()">🏠 Inicio</button>
+            <button class="btn-game" style="background: #2ed573; box-shadow: 0 6px 0 #219653;" onclick="resetLevel3()">🔄 Otro</button>
+        </div>
+    </div>
+
+    <!-- ================= SCREEN: OVERLAY DE EXITO ================= -->
+    <div id="overlay-success" class="overlay-success">
+        <div class="gold-star">⭐</div>
+        <h1 style="color: var(--color-gold); font-size: 2.8rem; margin-top: 15px;">¡Excelente!</h1>
+        <h2 style="font-size: 1.35rem; margin-top: 10px;" id="txt-success-msg">¡Has completado la misión!</h2>
+        <button class="btn-game" style="margin-top: 30px; background: #2ed573; box-shadow: 0 6px 0 #219653;" onclick="closeSuccessOverlay()">
+            🎮 ¡Seguir Jugando!
+        </button>
+    </div>
+
+    <script>
+        // Web Audio API Synthesizer Class for fully-offline sound effects
+        class OfflineAudioSynth {
+            constructor() {
+                this.ctx = null;
+            }
+
+            init() {
+                if (!this.ctx) {
+                    this.ctx = new (window.AudioContext || window.webkitAudioContext)();
+                }
+                if (this.ctx.state === 'suspended') {
+                    this.ctx.resume();
+                }
+            }
+
+            playPop() {
+                this.init();
+                const osc = this.ctx.createOscillator();
+                const gain = this.ctx.createGain();
+
+                osc.connect(gain);
+                gain.connect(this.ctx.destination);
+
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(320, this.ctx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(120, this.ctx.currentTime + 0.12);
+
+                gain.gain.setValueAtTime(0.25, this.ctx.currentTime);
+                gain.gain.linearRampToValueAtTime(0, this.ctx.currentTime + 0.12);
+
+                osc.start();
+                osc.stop(this.ctx.currentTime + 0.13);
+            }
+
+            playSuccess() {
+                this.init();
+                const now = this.ctx.currentTime;
+                
+                // Arpeggio notes (C Major: C4 - E4 - G4 - C5)
+                const notes = [261.63, 329.63, 392.00, 523.25];
+                notes.forEach((freq, index) => {
+                    const osc = this.ctx.createOscillator();
+                    const gain = this.ctx.createGain();
+
+                    osc.connect(gain);
+                    gain.connect(this.ctx.destination);
+
+                    osc.type = 'triangle';
+                    osc.frequency.setValueAtTime(freq, now + index * 0.08);
+
+                    gain.gain.setValueAtTime(0.2, now + index * 0.08);
+                    gain.gain.linearRampToValueAtTime(0, now + index * 0.08 + 0.25);
+
+                    osc.start(now + index * 0.08);
+                    osc.stop(now + index * 0.08 + 0.26);
+                });
+            }
+
+            playError() {
+                this.init();
+                const osc = this.ctx.createOscillator();
+                const gain = this.ctx.createGain();
+
+                osc.connect(gain);
+                gain.connect(this.ctx.destination);
+
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(130, this.ctx.currentTime);
+                osc.frequency.setValueAtTime(95, this.ctx.currentTime + 0.08);
+
+                gain.gain.setValueAtTime(0.15, this.ctx.currentTime);
+                gain.gain.linearRampToValueAtTime(0, this.ctx.currentTime + 0.3);
+
+                osc.start();
+                osc.stop(this.ctx.currentTime + 0.31);
+            }
+
+            playMagic() {
+                this.init();
+                const now = this.ctx.currentTime;
+                const duration = 0.35;
+                
+                const osc = this.ctx.createOscillator();
+                const gain = this.ctx.createGain();
+                
+                osc.connect(gain);
+                gain.connect(this.ctx.destination);
+                
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(400, now);
+                osc.frequency.exponentialRampToValueAtTime(1100, now + duration);
+                
+                gain.gain.setValueAtTime(0.15, now);
+                gain.gain.linearRampToValueAtTime(0, now + duration);
+                
+                osc.start();
+                osc.stop(now + duration + 0.01);
+            }
+        }
+
+        const sound = new OfflineAudioSynth();
+
+        // Speech synthesis setup
+        let currentLevel = 0;
+        let currentInstructionText = "";
+
+        function speak(text) {
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.cancel(); // Cancel active speech
+                const sentence = new SpeechSynthesisUtterance(text);
+                sentence.lang = 'es-MX';
+                sentence.pitch = 1.35; // Cute kid pirate pitch
+                sentence.rate = 0.85;  // Friendly, slower pace for kids
+                window.speechSynthesis.speak(sentence);
+            }
+        }
+
+        function speakStory() {
+            speak("¡Hola, grumete! Soy el Pirata Numerón. Mis crayolas de colores se cayeron en la isla. ¿Me ayudas a encontrarlas y ordenarlas en mi cofre? ¡Elige una misión para empezar!");
+        }
+
+        function speakCurrentInstruction() {
+            if (currentInstructionText) {
+                speak(currentInstructionText);
+            }
+        }
+
+        // Screen Routing
+        function showScreen(screenId) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.getElementById(screenId).classList.add('active');
+            
+            const header = document.getElementById('header-bar');
+            if (screenId === 'screen-menu') {
+                header.style.display = 'none';
+            } else {
+                header.style.display = 'flex';
+            }
+            window.speechSynthesis.cancel();
+        }
+
+        function goHome() {
+            currentLevel = 0;
+            currentInstructionText = "";
+            showScreen('screen-menu');
+        }
+
+        // Crayon Factory (CSS-drawn crayons)
+        const crayonColors = [
+            '#ff4757', '#2e5bec', '#2ed573', '#ffa502', '#9b59b6', 
+            '#eccc68', '#ff7f50', '#1abc9c', '#ff6b81', '#341f97',
+            '#05c46b', '#ffd32c', '#575fcf', '#0be881', '#ef5777', 
+            '#4bc0c0', '#9966ff', '#ff9f40', '#36a2eb', '#ff6384'
+        ];
+        
+        function createCrayonCSS(number, color, idStr = '') {
+            const crayon = document.createElement('div');
+            crayon.className = 'crayon';
+            if (idStr) crayon.id = idStr;
+            crayon.style.setProperty('--crayon-color', color || '#ff4757');
+            
+            const tip = document.createElement('div');
+            tip.className = 'crayon-tip';
+            
+            const body = document.createElement('div');
+            body.className = 'crayon-body';
+            body.innerText = number;
+            
+            crayon.appendChild(tip);
+            crayon.appendChild(body);
+            return crayon;
+        }
+
+        function createParticle(x, y, emoji = '✨') {
+            const particle = document.createElement('div');
+            particle.className = 'particle';
+            particle.innerText = emoji;
+            particle.style.left = (x - 10) + 'px';
+            particle.style.top = (y - 10) + 'px';
+            particle.style.fontSize = (Math.random() * 20 + 20) + 'px';
+            document.body.appendChild(particle);
+            setTimeout(() => particle.remove(), 1000);
+        }
+
+        function triggerConfetti(count = 15) {
+            const emojis = ['✨', '⭐', '🪙', '🖍️', '🍬'];
+            for(let i=0; i<count; i++) {
+                setTimeout(() => {
+                    const rx = Math.random() * window.innerWidth;
+                    const ry = Math.random() * (window.innerHeight * 0.7);
+                    const randomEmoji = emojis[Math.floor(Math.random() * emojis.length)];
+                    createParticle(rx, ry, randomEmoji);
+                    sound.playPop();
+                }, i * 60);
+            }
+        }
+
+        function showSuccessOverlay(msgText = "") {
+            sound.playSuccess();
+            triggerConfetti(20);
+            document.getElementById('txt-success-msg').innerText = msgText || "¡Has completado la misión!";
+            document.getElementById('overlay-success').classList.add('active');
+        }
+
+        function closeSuccessOverlay() {
+            document.getElementById('overlay-success').classList.remove('active');
+            if (currentLevel === 1) resetLevel1();
+            else if (currentLevel === 2) resetLevel2();
+            else if (currentLevel === 3) resetLevel3();
+        }
+
+        function startLevel(levelNum) {
+            currentLevel = levelNum;
+            showScreen(`screen-level${levelNum}`);
+            
+            const titleEl = document.getElementById('game-title-text');
+            const scoreEl = document.getElementById('top-score-display');
+            scoreEl.innerText = "";
+            
+            if (levelNum === 1) {
+                titleEl.innerText = "Misión 1: ¡A buscar!";
+                resetLevel1();
+            } else if (levelNum === 2) {
+                titleEl.innerText = "Misión 2: Reto Pirata";
+                resetLevel2();
+            } else if (levelNum === 3) {
+                titleEl.innerText = "Misión 3: Caja 1-20";
+                resetLevel3();
+            }
+        }
+
+        // ================= LEVEL 1 LOGIC =================
+        let l1FoundCount = 0;
+        let l1TotalNeeded = 5;
+
+        function resetLevel1() {
+            l1FoundCount = 0;
+            const sandbox = document.getElementById('sandbox-l1');
+            const slotsContainer = document.getElementById('slots-l1');
+            
+            // Clean up old dynamic crayons
+            document.querySelectorAll('.l1-dynamic').forEach(el => el.remove());
+            slotsContainer.innerHTML = '';
+            
+            // Generate empty slots inside box
+            for(let i=0; i<l1TotalNeeded; i++) {
+                const slot = document.createElement('div');
+                slot.className = 'crayon-slot-silhouette';
+                slot.innerText = '?';
+                slotsContainer.appendChild(slot);
+            }
+            
+            // Coordinates inside beach area (adapted to keep visible on standard views)
+            const coordinates = [
+                {x: 18, y: 35, angle: -25}, // near palm tree
+                {x: 32, y: 70, angle: 15},  // near barrel
+                {x: 48, y: 40, angle: 90},  // middle beach
+                {x: 62, y: 65, angle: 45},  // near crab
+                {x: 78, y: 30, angle: -65}  // near chest
+            ];
+            
+            const shuffledCoordinates = [...coordinates].sort(() => Math.random() - 0.5);
+            
+            for(let i = 1; i <= l1TotalNeeded; i++) {
+                const cColor = crayonColors[i - 1];
+                const crayonEl = createCrayonCSS(i, cColor, `c-l1-${i}`);
+                crayonEl.classList.add('hidden-crayon', 'l1-dynamic');
+                
+                const pos = shuffledCoordinates[i - 1];
+                crayonEl.style.left = `${pos.x}%`;
+                crayonEl.style.top = `${pos.y}%`;
+                crayonEl.style.transform = `rotate(${pos.angle}deg) scale(0.95)`;
+                
+                if (pos.x < 30) crayonEl.style.zIndex = '2'; // behind tree (z:3)
+                else if (pos.x > 70) crayonEl.style.zIndex = '2'; // behind chest (z:3)
+                
+                crayonEl.onclick = (e) => {
+                    if (crayonEl.classList.contains('found')) return;
+                    e.stopPropagation();
+                    clickFoundCrayon(i, e.clientX, e.clientY);
+                };
+                
+                sandbox.appendChild(crayonEl);
+            }
+
+            document.getElementById('top-score-display').innerText = `Encontradas: 0 / ${l1TotalNeeded}`;
+            currentInstructionText = "¡Mira la playa! Hay cinco crayolas perdidas. ¡Búscalas y tócalas para contarlas!";
+            speak(currentInstructionText);
+        }
+
+        function clickChest() {
+            sound.playPop();
+            speak("¡Ahoy! Ese cofre guarda hermosos tesoros, ¡pero busca las crayolas que están en la arena!");
+            createParticle(window.innerWidth * 0.8, window.innerHeight * 0.5, '🪙');
+        }
+
+        function clickFoundCrayon(num, clickX, clickY) {
+            const crayonEl = document.getElementById(`c-l1-${num}`);
+            crayonEl.classList.add('found');
+            crayonEl.style.zIndex = '10';
+            
+            l1FoundCount++;
+            document.getElementById('top-score-display').innerText = `Encontradas: ${l1FoundCount} / ${l1TotalNeeded}`;
+            
+            sound.playMagic();
+            createParticle(clickX, clickY, '⭐');
+            speak(num.toString());
+
+            const slotsContainer = document.getElementById('slots-l1');
+            const slotEl = slotsContainer.children[l1FoundCount - 1];
+            
+            const rectStart = crayonEl.getBoundingClientRect();
+            const rectEnd = slotEl.getBoundingClientRect();
+            
+            crayonEl.style.position = 'fixed';
+            crayonEl.style.top = `${rectStart.top}px`;
+            crayonEl.style.left = `${rectStart.left}px`;
+            crayonEl.style.transform = 'scale(1.2) rotate(360deg)';
+            
+            setTimeout(() => {
+                crayonEl.style.transition = 'all 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
+                crayonEl.style.top = `${rectEnd.top}px`;
+                crayonEl.style.left = `${rectEnd.left}px`;
+                crayonEl.style.transform = 'scale(0.8) rotate(360deg)';
+            }, 50);
+
+            setTimeout(() => {
+                slotEl.innerHTML = '';
+                slotEl.style.border = 'none';
+                slotEl.style.background = 'transparent';
+                
+                const cColor = crayonEl.style.getPropertyValue('--crayon-color');
+                const miniCrayon = createCrayonCSS(num, cColor);
+                miniCrayon.style.transform = 'scale(0.8)';
+                miniCrayon.style.cursor = 'default';
+                slotEl.appendChild(miniCrayon);
+                
+                crayonEl.remove();
+                sound.playPop();
+                createParticle(rectEnd.left + 15, rectEnd.top + 30, '✨');
+                
+                if (l1FoundCount === l1TotalNeeded) {
+                    setTimeout(() => {
+                        showSuccessOverlay(`¡Qué gran explorador! Encontraste las ${l1TotalNeeded} crayolas perdidas.`);
+                        speak("¡Excelente trabajo, grumete! Encontraste las cinco crayolas del pirata.");
+                    }, 1000);
+                }
+            }, 850);
+        }
+
+        // ================= LEVEL 2 DYNAMIC CHALLENGES LOGIC =================
+        let l2RetoType = 0; // 0: Mas, 1: Menos, 2: Numero Secreto, 3: Balanza
+        let l2CorrectOption = ""; 
+        
+        // Data states for Retos
+        let l2LeftCrayons = 0;
+        let l2RightCrayons = 0;
+        let l2CenterCrayons = 0;
+        let l2SecretTarget = 0;
+
+        function resetLevel2() {
+            // Cancel any scale event handlers and clean layouts
+            document.getElementById('layout-l2-compare').style.display = 'none';
+            document.getElementById('layout-l2-scale').style.display = 'none';
+            
+            const cardLeft = document.getElementById('card-l2-left');
+            const cardRight = document.getElementById('card-l2-right');
+            const cardCenter = document.getElementById('card-l2-center');
+            
+            cardLeft.className = 'compare-card-l2';
+            cardRight.className = 'compare-card-l2';
+            cardCenter.className = 'compare-card-l2';
+            cardCenter.style.display = 'none';
+
+            // Pick a random challenge: 0, 1, 2, 3
+            l2RetoType = Math.floor(Math.random() * 4);
+            
+            const scoreEl = document.getElementById('top-score-display');
+            
+            if (l2RetoType === 0) {
+                // RETO 0: MAS
+                scoreEl.innerText = "Reto: ¿Dónde hay MÁS?";
+                setupCompareReto("mas");
+            } else if (l2RetoType === 1) {
+                // RETO 1: MENOS
+                scoreEl.innerText = "Reto: ¿Dónde hay MENOS?";
+                setupCompareReto("menos");
+            } else if (l2RetoType === 2) {
+                // RETO 2: NUMERO SECRETO
+                scoreEl.innerText = "Reto: El Número Secreto";
+                setupSecretNumberReto();
+            } else if (l2RetoType === 3) {
+                // RETO 3: BALANZA PIRATA
+                scoreEl.innerText = "Reto: Equilibra la Balanza";
+                setupBalanceScaleReto();
+            }
+        }
+
+        // Setup for Retos 0 and 1 (Mas / Menos)
+        function setupCompareReto(type) {
+            document.getElementById('layout-l2-compare').style.display = 'flex';
+            
+            const gridLeft = document.getElementById('grid-l2-left');
+            const gridRight = document.getElementById('grid-l2-right');
+            gridLeft.innerHTML = ''; gridRight.innerHTML = '';
+
+            document.getElementById('lbl-l2-left').innerText = "Caja A";
+            document.getElementById('lbl-l2-right').innerText = "Caja B";
+
+            l2LeftCrayons = Math.floor(Math.random() * 5) + 1; // 1 to 5
+            l2RightCrayons = Math.floor(Math.random() * 5) + 1;
+            while(l2LeftCrayons === l2RightCrayons) {
+                l2RightCrayons = Math.floor(Math.random() * 5) + 1;
+            }
+
+            const leftColor = crayonColors[Math.floor(Math.random() * 8)];
+            let rightColor = crayonColors[Math.floor(Math.random() * 8)];
+            while(leftColor === rightColor) { rightColor = crayonColors[Math.floor(Math.random() * 8)]; }
+
+            // Fill left
+            for(let i=0; i<l2LeftCrayons; i++) gridLeft.appendChild(createCrayonCSS('', leftColor));
+            // Fill right
+            for(let i=0; i<l2RightCrayons; i++) gridRight.appendChild(createCrayonCSS('', rightColor));
+
+            if (type === "mas") {
+                l2CorrectOption = l2LeftCrayons > l2RightCrayons ? "left" : "right";
+                document.getElementById('txt-inst-l2').innerText = "¡Toca la caja que tiene MÁS crayolas!";
+                currentInstructionText = "Toca el recuadro que tenga MÁS crayolas.";
+            } else {
+                l2CorrectOption = l2LeftCrayons < l2RightCrayons ? "left" : "right";
+                document.getElementById('txt-inst-l2').innerText = "¡Toca la caja que tiene MENOS crayolas!";
+                currentInstructionText = "Toca el recuadro que tenga MENOS crayolas.";
+            }
+            speak(currentInstructionText);
+        }
+
+        // Setup for Reto 2 (Numero Secreto - 3 Boxes)
+        function setupSecretNumberReto() {
+            document.getElementById('layout-l2-compare').style.display = 'flex';
+            
+            const cardCenter = document.getElementById('card-l2-center');
+            cardCenter.style.display = 'flex';
+
+            const gridLeft = document.getElementById('grid-l2-left');
+            const gridRight = document.getElementById('grid-l2-right');
+            const gridCenter = document.getElementById('grid-l2-center');
+            
+            gridLeft.innerHTML = ''; gridRight.innerHTML = ''; gridCenter.innerHTML = '';
+
+            document.getElementById('lbl-l2-left').innerText = "Cofre A";
+            document.getElementById('lbl-l2-right').innerText = "Cofre B";
+            document.getElementById('lbl-l2-center').innerText = "Cofre C";
+
+            // Generate three unique values from 1 to 6
+            const nums = [1, 2, 3, 4, 5, 6].sort(() => Math.random() - 0.5);
+            l2LeftCrayons = nums[0];
+            l2RightCrayons = nums[1];
+            l2CenterCrayons = nums[2];
+
+            // Fill left, right, center grids with distinct colors
+            for(let i=0; i<l2LeftCrayons; i++) gridLeft.appendChild(createCrayonCSS('', '#ff4757'));
+            for(let i=0; i<l2RightCrayons; i++) gridRight.appendChild(createCrayonCSS('', '#2ed573'));
+            for(let i=0; i<l2CenterCrayons; i++) gridCenter.appendChild(createCrayonCSS('', '#ffa502'));
+
+            // Pick one value as target
+            const targetIndex = Math.floor(Math.random() * 3);
+            const targetValues = [l2LeftCrayons, l2RightCrayons, l2CenterCrayons];
+            const targetNames = ["left", "right", "center"];
+
+            l2SecretTarget = targetValues[targetIndex];
+            l2CorrectOption = targetNames[targetIndex];
+
+            document.getElementById('txt-inst-l2').innerText = `¡Busca el cofre que tiene exactamente ${l2SecretTarget} crayolas!`;
+            currentInstructionText = `Busca y toca el cofre que tiene exactamente ${l2SecretTarget} crayolas. ¡Cuéntalas con cuidado!`;
+            speak(currentInstructionText);
+        }
+
+        // Setup for Reto 3 (Balanza Pirata)
+        function setupBalanceScaleReto() {
+            document.getElementById('layout-l2-scale').style.display = 'flex';
+
+            const leftArea = document.getElementById('scale-crayons-left');
+            const rightArea = document.getElementById('scale-crayons-right');
+            leftArea.innerHTML = ''; rightArea.innerHTML = '';
+
+            // Left platform has more crayons (between 3 and 6)
+            l2LeftCrayons = Math.floor(Math.random() * 4) + 3; // 3 to 6
+            // Right platform has less (between 1 and Left - 1)
+            l2RightCrayons = Math.floor(Math.random() * (l2LeftCrayons - 1)) + 1; // 1 to Left - 1
+
+            // Fill platforms
+            const leftColor = '#341f97';
+            const rightColor = '#ef5777';
+
+            for(let i=0; i<l2LeftCrayons; i++) {
+                leftArea.appendChild(createCrayonCSS('', leftColor));
+            }
+            for(let i=0; i<l2RightCrayons; i++) {
+                rightArea.appendChild(createCrayonCSS('', rightColor));
+            }
+
+            // Animate scale physics
+            updateScalePhysics();
+
+            document.getElementById('txt-inst-l2').innerText = `¡Equilibra la balanza! Añade crayolas en el platillo derecho.`;
+            currentInstructionText = `¡Equilibra la balanza pirata! En el platillo izquierdo hay ${l2LeftCrayons} crayolas, pero el derecho tiene menos. Pulsa el botón dorado del más para poner crayolas hasta que los dos lados pesen igual.`;
+            speak(currentInstructionText);
+        }
+
+        function updateScalePhysics() {
+            const beam = document.getElementById('scale-beam');
+            const leftPan = document.getElementById('scale-left-pan');
+            const rightPan = document.getElementById('scale-right-pan');
+
+            // Calculate tilt angle: left side pulls positive, right side pulls negative
+            // If they are equal, angle is 0
+            const diff = l2LeftCrayons - l2RightCrayons;
+            
+            // Limit tilt angle max to 20deg
+            let angle = diff * 5; 
+            if (angle > 20) angle = 20;
+            if (angle < -20) angle = -20;
+
+            // Animate Beam rotation
+            beam.style.transform = `rotate(${angle}deg)`;
+            
+            // Rotate pans in opposite direction to hang straight down!
+            leftPan.style.transform = `rotate(${-angle}deg)`;
+            rightPan.style.transform = `rotate(${-angle}deg)`;
+        }
+
+        function addCrayonToScaleRight() {
+            if (l2RetoType !== 3) return; // only valid in scale mode
+            
+            // If already balanced, click shouldn't do anything
+            if (l2LeftCrayons === l2RightCrayons) return;
+
+            sound.playPop();
+            
+            l2RightCrayons++;
+            
+            const rightArea = document.getElementById('scale-crayons-right');
+            const rightColor = '#ef5777';
+            
+            const cEl = createCrayonCSS('', rightColor);
+            cEl.style.animation = 'zoomIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
+            rightArea.appendChild(cEl);
+
+            const rect = cEl.getBoundingClientRect();
+            createParticle(rect.left + rect.width/2, rect.top + rect.height/2, '🖍️');
+
+            // Update physical tilt
+            updateScalePhysics();
+
+            // Count out loud
+            speak(l2RightCrayons.toString());
+
+            if (l2RightCrayons === l2LeftCrayons) {
+                // Perfectly balanced!
+                setTimeout(() => {
+                    sound.playSuccess();
+                    const rectContainer = document.getElementById('layout-l2-scale').getBoundingClientRect();
+                    triggerConfetti(12);
+                    showSuccessOverlay(`¡Excelente! Lograste equilibrar la balanza. Ambos platillos tienen exactamente ${l2LeftCrayons} crayolas.`);
+                    speak("¡Perfecto! Lograste equilibrar la balanza pirata. ¡Eres muy inteligente!");
+                }, 800);
+            } else if (l2RightCrayons > l2LeftCrayons) {
+                // Oops! Too many crayons
+                setTimeout(() => {
+                    sound.playError();
+                    speak("¡Oh oh! Ahora el lado derecho pesa demasiado. Vamos a iniciar de nuevo este reto.");
+                    setTimeout(() => {
+                        setupBalanceScaleReto();
+                    }, 1200);
+                }, 800);
+            }
+        }
+
+        // Selection handle for Retos 0, 1, 2
+        function selectCompareCard(side) {
+            if (l2RetoType === 3) return; // Scale mode doesn't use compare cards
+
+            const cardSelected = document.getElementById(`card-l2-${side}`);
+            
+            if (side === l2CorrectOption) {
+                cardSelected.classList.add('correct');
+                const rect = cardSelected.getBoundingClientRect();
+                createParticle(rect.left + rect.width/2, rect.top + rect.height/2, '🪙');
+                
+                let quantityMessage = "";
+                if (l2RetoType === 0 || l2RetoType === 1) {
+                    quantityMessage = `¡Excelente! La Caja A tiene ${l2LeftCrayons} y la Caja B tiene ${l2RightCrayons}.`;
+                } else if (l2RetoType === 2) {
+                    quantityMessage = `¡Muy bien! Encontraste el cofre con exactamente ${l2SecretTarget} crayolas.`;
+                }
+
+                setTimeout(() => {
+                    showSuccessOverlay(quantityMessage);
+                    speak("¡Excelente! Encontraste el cofre correcto.");
+                }, 600);
+            } else {
+                cardSelected.classList.add('incorrect');
+                sound.playError();
+                
+                if (l2RetoType === 0) {
+                    speak("¡Oh oh! Busca el recuadro que tiene más crayolas.");
+                } else if (l2RetoType === 1) {
+                    speak("¡Oh oh! Busca el recuadro que tiene menos crayolas.");
+                } else if (l2RetoType === 2) {
+                    speak(`¡Oh oh! Cuenta con cuidado, ese cofre no tiene ${l2SecretTarget} crayolas.`);
+                }
+
+                setTimeout(() => {
+                    cardSelected.classList.remove('incorrect');
+                }, 600);
+            }
+        }
+
+        // ================= LEVEL 3 LOGIC (SERIACION HASTA EL 20) =================
+        let l3CurrentTarget = 1;
+        const l3TotalNeeded = 20;
+
+        function resetLevel3() {
+            l3CurrentTarget = 1;
+            const slotsGrid = document.getElementById('slots-l3-grid');
+            const drawerGrid = document.getElementById('drawer-l3-grid');
+            
+            slotsGrid.innerHTML = '';
+            drawerGrid.innerHTML = '';
+
+            // Generate 20 vacant slots
+            for(let i=1; i<=l3TotalNeeded; i++) {
+                const slot = document.createElement('div');
+                slot.className = 'slot-silhouette-20';
+                slot.id = `slot-l3-${i}`;
+                slot.innerText = i.toString();
+                slotsGrid.appendChild(slot);
+            }
+
+            // Scatter crayons 1 to 20
+            const crayonsData = [];
+            for(let i=1; i<=l3TotalNeeded; i++) {
+                crayonsData.push({
+                    number: i,
+                    color: crayonColors[i-1]
+                });
+            }
+
+            // Shuffle sequence
+            const shuffledCrayons = [...crayonsData].sort(() => Math.random() - 0.5);
+
+            shuffledCrayons.forEach((item) => {
+                const crayonEl = createCrayonCSS(item.number, item.color, `c-l3-${item.number}`);
+                crayonEl.onclick = (e) => {
+                    e.stopPropagation();
+                    clickSeriacionCrayon(item.number, e.clientX, e.clientY);
+                };
+                drawerGrid.appendChild(crayonEl);
+            });
+
+            document.getElementById('top-score-display').innerText = `Siguiente: Nº 1`;
+            document.getElementById('txt-inst-l3').innerText = "¡Vamos a ordenar las crayolas! Busca el número 1.";
+            currentInstructionText = "Vamos a ordenar las 20 crayolas en la caja. Busca la crayola con el número uno.";
+            speak(currentInstructionText);
+        }
+
+        function clickSeriacionCrayon(num, clickX, clickY) {
+            const crayonEl = document.getElementById(`c-l3-${num}`);
+            
+            if (num === l3CurrentTarget) {
+                // Correct crayon clicked
+                sound.playMagic();
+                createParticle(clickX, clickY, '✨');
+                speak(num.toString());
+
+                const slotEl = document.getElementById(`slot-l3-${num}`);
+                
+                // Fly animation to Crayon grid slot
+                const rectStart = crayonEl.getBoundingClientRect();
+                const rectEnd = slotEl.getBoundingClientRect();
+                
+                crayonEl.style.position = 'fixed';
+                crayonEl.style.top = `${rectStart.top}px`;
+                crayonEl.style.left = `${rectStart.left}px`;
+                crayonEl.style.zIndex = '100';
+                crayonEl.style.transform = 'scale(1.2)';
+                
+                setTimeout(() => {
+                    crayonEl.style.transition = 'all 0.75s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
+                    crayonEl.style.top = `${rectEnd.top}px`;
+                    crayonEl.style.left = `${rectEnd.left}px`;
+                    crayonEl.style.transform = 'scale(0.48)';
+                }, 50);
+
+                setTimeout(() => {
+                    slotEl.innerHTML = '';
+                    slotEl.style.border = 'none';
+                    slotEl.style.background = 'transparent';
+                    
+                    const cColor = crayonEl.style.getPropertyValue('--crayon-color');
+                    const miniCrayon = createCrayonCSS(num, cColor);
+                    miniCrayon.style.transform = 'scale(0.48)';
+                    miniCrayon.style.cursor = 'default';
+                    slotEl.appendChild(miniCrayon);
+                    
+                    crayonEl.remove();
+                    sound.playPop();
+                    createParticle(rectEnd.left + 10, rectEnd.top + 15, '⭐');
+                    
+                    // Increment target
+                    l3CurrentTarget++;
+                    
+                    if (l3CurrentTarget > l3TotalNeeded) {
+                        document.getElementById('top-score-display').innerText = `¡Caja completa!`;
+                        setTimeout(() => {
+                            showSuccessOverlay("¡Las 20 crayolas del Pirata Numerón están ordenadas!");
+                            speak("¡Increíble! Lograste ordenar las veinte crayolas. Eres un verdadero campeón.");
+                        }, 900);
+                    } else {
+                        document.getElementById('top-score-display').innerText = `Siguiente: Nº ${l3CurrentTarget}`;
+                        document.getElementById('txt-inst-l3').innerText = `¡Muy bien! Ahora busca el número ${l3CurrentTarget}.`;
+                        
+                        // Milestones encouragement
+                        if (l3CurrentTarget === 11) {
+                            speak(`¡Excelente! Llevas la mitad. Ahora busca el número once.`);
+                        } else {
+                            speak(l3CurrentTarget.toString());
+                        }
+                        currentInstructionText = `¡Excelente! Ahora busca la crayola con el número ${l3CurrentTarget}.`;
+                    }
+                }, 800);
+
+            } else {
+                // Incorrect Crayon clicked
+                sound.playError();
+                crayonEl.style.transform = 'scale(0.8) rotate(6deg)';
+                speak(`¡Oh oh! Busca la crayola número ${l3CurrentTarget}.`);
+                setTimeout(() => {
+                    crayonEl.style.transform = 'scale(0.7) rotate(0deg)';
+                }, 400);
+            }
+        }
+
+        // Initialize game on load
+        window.addEventListener('DOMContentLoaded', () => {
+            document.body.addEventListener('click', () => {
+                sound.init();
+            }, { once: true });
+        });
+    </script>
+</body>
+</html>
